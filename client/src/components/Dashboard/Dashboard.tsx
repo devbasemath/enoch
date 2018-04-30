@@ -18,11 +18,14 @@ export class Dashboard extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
         this.onDrop = this.onDrop.bind(this);
-        this.toggleModal = this.toggleModal.bind(this);
+        this.toggleSendModal = this.toggleSendModal.bind(this);
+        this.toggleInvoicesModal = this.toggleInvoicesModal.bind(this);
         this.state = {
             invoice: invoice,
             user: user,
-            modal: false,
+            sendModal: false,
+            invoicesModal: false,
+
             currency_sign: '$'
         };
     }
@@ -76,7 +79,18 @@ export class Dashboard extends React.Component<any, any> {
         this.state.invoice.logo='';
         this.setState({ invoice: this.state.invoice });
     }
+    saveToLocal(){
+        let localInvoices = JSON.parse(localStorage.getItem("invoices"));
+        if(!localInvoices) localInvoices=[];
+        const item={
+            invoice: this.state.invoice,
+            time: moment().format('LLL')
+        }
+        localInvoices.push(item);
+        localStorage.setItem('invoices', JSON.stringify(localInvoices));
+    }
     generate(){
+        this.saveToLocal();
         InvoiceService.generate(this.state.invoice).then(resp=>{
             this.download(resp.data);
         })
@@ -94,7 +108,8 @@ export class Dashboard extends React.Component<any, any> {
         document.body.removeChild(element);
     }
     sendInvoice(){
-        this.toggleModal();
+        this.saveToLocal();
+        this.toggleSendModal();
         InvoiceService.send(this.state.invoice, this.state.user).then(resp=>{
             Swal({
                 type: 'success',
@@ -109,16 +124,27 @@ export class Dashboard extends React.Component<any, any> {
             })
         })
     }
-    toggleModal() {
-        this.setState({
-            modal: !this.state.modal
-        });
+    toggleSendModal() {
+        this.setState({ sendModal: !this.state.sendModal });
+    }
+    toggleInvoicesModal(){
+        this.setState({ invoicesModal: !this.state.invoicesModal })
+    }
+    selectInvoice(invoice){
+        this.toggleInvoicesModal();
+        this.setState({ invoice: invoice });
+    }
+    clearLocalInvoices(){        
+        this.toggleInvoicesModal();
+        localStorage.removeItem('invoices');
     }
     render() {
+        let localInvoices = JSON.parse(localStorage.getItem("invoices"));
+        if(!localInvoices) localInvoices=[];
         return (
             <div className="">
-                <Modal isOpen={this.state.modal} toggle={this.toggleModal} >
-                    <ModalHeader toggle={this.toggleModal}>Send Invoice</ModalHeader>
+                <Modal isOpen={this.state.sendModal} toggle={this.toggleSendModal} >
+                    <ModalHeader toggle={this.toggleSendModal}>Send Invoice</ModalHeader>
                     <ModalBody>
                         <FormGroup>
                             <Label>To</Label>
@@ -153,6 +179,40 @@ export class Dashboard extends React.Component<any, any> {
                         <Button color="primary" onClick={this.sendInvoice.bind(this)}>Send</Button>
                     </ModalFooter>
                 </Modal>
+                <Modal isOpen={this.state.invoicesModal} toggle={this.toggleInvoicesModal} size="lg">
+                    <ModalHeader toggle={this.toggleInvoicesModal}>My Invoices</ModalHeader>
+                    <ModalBody>
+                        <hr/>
+                        <div className="item_wrapper" style={{fontWeight: 'bold'}}>
+                            <div className="item_no">#</div>
+                            <div className="item_number">Number</div>
+                            <div className="item_from">From</div>
+                            <div className="item_to">To</div>
+                            <div className="item_time">Time</div>
+                        </div>
+                        <hr/>
+                        {
+                            localInvoices.map((item, index)=>{
+                                return(
+                                    <div key={index} >
+                                        <div className="invoice_list item_wrapper" onClick={()=>this.selectInvoice(item.invoice)} >
+                                            <div className="item_no">{index+1}</div>
+                                            <div className="item_number">{item.invoice.number}</div>
+                                            <div className="item_from">{item.invoice.from}</div>
+                                            <div className="item_to">{item.invoice.to}</div>
+                                            <div className="item_time">{item.time}</div>
+                                        </div>
+                                        <hr/>
+                                    </div>
+                                )
+                            })
+                        }
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="danger" onClick={this.clearLocalInvoices.bind(this)}>Clear</Button>
+                        <Button color="primary" onClick={this.toggleInvoicesModal.bind(this)}>Ok</Button>
+                    </ModalFooter>
+                </Modal>
                 <Navbar color="dark" dark >
                     <NavbarBrand href="/">Invoice-Generater</NavbarBrand>
                     <div className="currency_select">
@@ -168,8 +228,9 @@ export class Dashboard extends React.Component<any, any> {
                         </Input>
                     </div>
                     <div>
+                        <Button color="success" onClick={this.toggleInvoicesModal.bind(this)}>My invoices</Button>&nbsp;&nbsp;
                         <Button color="success" onClick={this.generate.bind(this)}>Download</Button>&nbsp;&nbsp;
-                        <Button color="success" onClick={this.toggleModal.bind(this)}>Send</Button>
+                        <Button color="success" onClick={this.toggleSendModal.bind(this)}>Send</Button>
                     </div>
                 </Navbar>
                 <div className="main_w">

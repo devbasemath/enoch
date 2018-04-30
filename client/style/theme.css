@@ -224,3 +224,32 @@ textarea{
 .currency_select select{
     margin-left: 10px;
 }
+
+.invoice_list{
+    cursor: pointer;
+}
+
+.item_wrapper{
+    display: flex;
+}
+.item_wrapper div{
+    padding-left: 10px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.item_no{
+    width: 5%;
+}
+.item_number{
+    width: 20%;
+}
+.item_from{
+    width: 20%;
+}
+.item_to{
+    width: 25%;
+}
+.item_time{
+    width: 30%;
+}
