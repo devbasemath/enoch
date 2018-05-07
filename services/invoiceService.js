@@ -8,21 +8,33 @@ var nodemailer = require('nodemailer');
 
 // const baseUrl = `${path.resolve()}/temp/`;
 
+// let transporter = nodemailer.createTransport({
+//     service: 'gmail',
+//     auth: {
+//         type: 'OAuth2',
+//         user: 'mosdev0429@gmail.com',
+//         clientId: '559892362120-ss647ftje2377jbmjklb80f0hgdg56vh.apps.googleusercontent.com',
+//         clientSecret: 'Qfa_m23TLtXJFOjGhI3PzCGJ',
+//         refreshToken: "1/HT50OY0h1wSYOfAPWBht1kNIv7jJwSqn9YyTv5Rs6lg",
+//         accessToken: "ya29.GlujBWCBkt9hWCBCKjUAipRUBAON-uO_Zch9y9mq1jeu-uzh7q_uqKw2oINMyzSawIGeXP1J9pMkC6pqzUrV6vMOkwgMozX7BkpecKoZh4y4rcmthE2oJjMtKsvX",
+//         expires: 1484314697598
+//     },
+//     tls: {
+//         rejectUnauthorized: false
+//     }
+// });
 let transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'send.one.com',
+    port: 465,
+    secure: true,
     auth: {
-        type: 'OAuth2',
-        user: 'mosdev0429@gmail.com',
-        clientId: '559892362120-ss647ftje2377jbmjklb80f0hgdg56vh.apps.googleusercontent.com',
-        clientSecret: 'Qfa_m23TLtXJFOjGhI3PzCGJ',
-        refreshToken: "1/HT50OY0h1wSYOfAPWBht1kNIv7jJwSqn9YyTv5Rs6lg",
-        accessToken: "ya29.GlujBWCBkt9hWCBCKjUAipRUBAON-uO_Zch9y9mq1jeu-uzh7q_uqKw2oINMyzSawIGeXP1J9pMkC6pqzUrV6vMOkwgMozX7BkpecKoZh4y4rcmthE2oJjMtKsvX",
-        expires: 1484314697598
+        user: 'tech@gharvest.org.uk',
+        pass: 'NxJr5KP;jfu*2gRr'
     },
     tls: {
         rejectUnauthorized: false
     }
-});
+})
 
 function generateInvoice(invoice, filename, success, error) {
     var postData = JSON.stringify(invoice);
@@ -81,11 +93,11 @@ module.exports.send = function(data){
         generateInvoice(invoice, 'invoice.pdf', function(base64String) {
             storeUser(invoice, user);
             var mailOptions = {
-                from: user.from,
+                from: 'tech@gharvest.org.uk',
                 to: user.to,
                 subject: `invoice from ${invoice.from}`,
                 // text: 'This is invoice text',
-                html: `<p>${user.message}</p>`,
+                html: `<p>from: ${user.from}</p><p>${user.message}</p>`,
                 attachments:[{
                     filename: 'invoice.pdf',
                     path: base64String
