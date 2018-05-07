@@ -13,8 +13,8 @@ let transporter = nodemailer.createTransport({
     port: 465,
     secure: true,
     auth: {
-        user: 'tech@gharvest.org.uk',
-        pass: 'NxJr5KP;jfu*2gRr'
+        user: 'invoice.generator@basemath.co.uk',
+        pass: 'kG!UaBqSzx54N3jV'
     },
     tls: {
         rejectUnauthorized: false
@@ -78,7 +78,7 @@ module.exports.send = function(data){
         generateInvoice(invoice, 'invoice.pdf', function(base64String) {
             storeUser(invoice, user);
             var mailOptions = {
-                from: 'tech@gharvest.org.uk',
+                from: 'invoice.generator@basemath.co.uk',
                 to: user.to,
                 subject: `invoice from ${invoice.from}`,
                 // text: 'This is invoice text',
